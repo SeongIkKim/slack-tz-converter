@@ -1,0 +1,16 @@
+"Let's schedule our next meeting for Tuesday at 10 am." - not relative weekday
+"Let's schedule our next meeting for this Thursday at 10 am." - relative date should be combined with weekday
+"Can you finish the report by this Friday?" - no time data, just relative weekday
+"Reminder: the deadline for the project submission is April 5th." - no time data, just absolute date
+"Are you available for a quick chat this afternoon?" - no time data, just relative vague time
+"I'll be out of the office until 2nd May."  - no time data, just absolute date
+"The product launch is set for July 20th." - no time data, just absolute date
+"How about we catch up over coffee next Monday morning?" - no time day, just relative weekday
+"The client meeting is postponed to next Thursday." - no time data, just relative weekday
+"I'll be working remotely next week." - no time data, just relative weekday
+"The software update will happen overnight on Saturday." - no time data, just relative weekday
+"Your appointment is confirmed for 2 pm on the 15th." - absolute date
+"Let's touch base first thing in the morning." - no time data, just relative vague time
+"We need the presentation ready by the end of the day." - no time data, just relative vague time
+"I'm taking a half-day leave tomorrow morning." - no time data, just relative vague time
+"The office will be closed for the holidays from December 24th to January 1st." - no time data, just absolute date
