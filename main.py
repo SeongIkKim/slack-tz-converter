@@ -16,21 +16,28 @@ logger = logging.getLogger(NAME)
 client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
 bolt = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
-def send_ephemeral_message_to_channel_members(channel_id, trigger_message):
+def send_ephemeral_message_to_channel_members(sender_id, channel_id, trigger_message, time_to_utc_dic, suffix):
     try:
         result = client.conversations_members(channel=channel_id)
         members = result['members']
 
         for user_id in members:
             # don't send a message to the bot itself
-            if user_id == bolt.client.auth_test()["user_id"]:
+            # if user_id in {bolt.client.auth_test()["user_id"], sender_id}:
+            if user_id in {bolt.client.auth_test()["user_id"]}:
                 continue
+
+            msg = trigger_message
+            for original_time, utc_time in time_to_utc_dic.items():
+                receiver_tz = ZoneInfo(get_user_timezone(user_id))
+                t = utc_time.astimezone(receiver_tz)
+                msg = msg.replace(original_time, f"*`{t.strftime('%H:%M %p, %Y-%m-%d')}`*[{receiver_tz}]")
 
             # send "only visible to you" message for each user in the channel
             client.chat_postEphemeral(
                 channel=channel_id,
                 user=user_id,
-                text=f"Ephemeral message in response to a trigger: {trigger_message}"
+                text=f"{msg} {suffix}"
             )
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -47,20 +54,20 @@ def get_user_timezone(user_id):
         raise e
 
 
-def postprocess_time(time_list):
+def postprocess_time(time):
     # "10:30 PM" -> "10:30PM"
-    time_list = [time.replace(" ", "") for time in time_list]
-    return time_list
+    return time.strip().replace(" ", "")
 
 
 def extract_utc_from_time(time_list, sender_tz):
     time_to_utc_dic = {}
 
     # python logic that extract utc from time like "10:30 PM" with sender's timezone("Asia/Seoul")
-    sender_tz = "America/Los_Angeles"
+    sender_tz = "America/Los_Angeles" # TODO for testing
     input_format = '%H:%M%p'
     for time in time_list:
-        t = datetime.strptime(time, input_format)
+        processed_time = postprocess_time(time)
+        t = datetime.strptime(processed_time, input_format)
         # date가 안들어왔다는 가정 하에
         date_now = datetime.now(ZoneInfo(sender_tz))
         local_time_with_tz = t.replace(
@@ -80,15 +87,11 @@ def timezone_convert(message, context):
     sender_id = message['user']
     original_times = [time for time in context['matches']]
     sender_tz = get_user_timezone(sender_id)
-    original_times = postprocess_time(original_times)
     time_to_utc_dic = extract_utc_from_time(original_times, sender_tz)
 
-    print(time_to_utc_dic)
-
-    # 각 매칭된 시간에 대해 "original time" -> "UTC time" 딕셔너리를 만들어서 넘김.
-    time = context['matches'][0]
-
-    send_ephemeral_message_to_channel_members(message['channel'], f"{sender_id} - {time}")
+    sender_tz = "America/Los_Angeles" # TODO for testing
+    suffix = f"\n--FROM user[{sender_id}] timezone *{sender_tz}*\n>{message['text']}"
+    send_ephemeral_message_to_channel_members(sender_id, message['channel'], message['text'], time_to_utc_dic, suffix)
 
 
 if __name__ == "__main__":
