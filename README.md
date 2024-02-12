@@ -3,6 +3,6 @@
 - [x] Integrate with slack
 - [x] Format text(basic)
 - [x] Datetime parsing(basic)
-- [ ] Dockerize
+- [x] Dockerize
 - [ ] Asynchronous processing
 - [ ] Handle edgecases

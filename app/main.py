@@ -9,12 +9,14 @@ from slack_sdk import WebClient
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dateutil.relativedelta import relativedelta, FR, MO, TU, WE, TH, SA, SU
+from dotenv import load_dotenv
 
 NAME = "slack-tz-helper"
 logger = logging.getLogger(NAME)
+load_dotenv(verbose=True, dotenv_path=".env")
 
-client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
-bolt = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
+bolt = App(token=os.getenv("SLACK_BOT_TOKEN"))
 
 def send_ephemeral_message_to_channel_members(sender_id, channel_id, trigger_message, time_to_utc_dic, suffix):
     try:
@@ -137,7 +139,7 @@ def timezone_convert(message, context):
     sender_info = get_user_info(sender_id)
     sender_name = get_user_name(sender_info)
     sender_tz = get_user_timezone(sender_info)
-    sender_tz = "Asia/Shanghai"  # TODO for testing
+    sender_tz = "America/Los_Angeles"  # TODO for testing
     original_msg = message['text']
     converted_msg = original_msg
 
@@ -173,4 +175,4 @@ def timezone_convert(message, context):
 
 
 if __name__ == "__main__":
-    SocketModeHandler(bolt, os.environ.get("SLACK_APP_TOKEN")).start()
+    SocketModeHandler(bolt, os.getenv("SLACK_APP_TOKEN")).start()

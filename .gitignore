@@ -212,7 +212,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+app/.env
 .venv
 env/
 venv/
@@ -629,4 +629,4 @@ MigrationBackup/
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,venv,vs
 
 .envrc
-.env
+app/.env
